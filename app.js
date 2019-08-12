@@ -64,7 +64,9 @@ var UIController = (function() {
         inputSelectedType: '.add__type',
         inputDescription: '.add__description',
         inputAmountValue: '.add__value',
-        inputAddButton: '.add__btn'
+        inputAddButton: '.add__btn',
+        incomeContainer: '.income__list',
+        expensesContainer: '.expenses__list'
     };
     
     return{
@@ -75,6 +77,42 @@ var UIController = (function() {
                 description: document.querySelector(DOMstrings.inputDescription).value,
                 amountValue: document.querySelector(DOMstrings.inputAmountValue).value
             };
+        },
+        
+        addListItem: function(obj, type) {
+            var html, newHtml, element;
+            // Create HTML string with placeholder text
+            
+            if (type === 'inc') {
+                element = DOMstrings.incomeContainer;
+                
+                html = '<div class="item clearfix" id="inc-%id%"> <div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            } else if (type === 'exp') {
+                element = DOMstrings.expensesContainer;
+                
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+            
+            // Replace the placeholder text with some actual data
+            newHtml = html.replace('%id%', obj.id);
+            newHtml = newHtml.replace('%description%', obj.description);
+            newHtml = newHtml.replace('%value%', obj.amountValue);
+            
+            // Insert the HTML into the DOM
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+        },
+        
+        clearFields: function(){
+            var fields, fieldsArray;
+            fields = document.querySelectorAll(DOMstrings.inputDescription + ',' + DOMstrings.inputAmountValue);
+            
+            fieldsArray = Array.prototype.slice.call(fields);
+            
+            fieldsArray.forEach(function(current, index, array){
+                current.value="";
+            });
+            
+            fieldsArray[0].focus();
         },
         
         getDOMStrings: function(){
@@ -106,8 +144,13 @@ var appController = (function(budgetCtrl, UICtrl){
         
         inputData = UICtrl.getInputData();
         
-        //Adding item
+        //Adding item into Budget
         newItem = budgetCtrl.addItem(inputData.selectedType, inputData.description, inputData.amountValue);
+        
+        //Adding item on UI
+        UICtrl.addListItem(newItem, inputData.selectedType);
+        
+        UICtrl.clearFields();
         
     };
     
